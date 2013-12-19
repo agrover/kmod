@@ -130,6 +130,30 @@ AS_IF([test "x$enable_debug" = "xyes"], [
 	AC_DEFINE(ENABLE_DEBUG, [1], [Debug messages.])
 ])
 
+AC_ARG_ENABLE([python],
+	AS_HELP_STRING([--enable-python], [enable Python libkmod bindings @<:@default=disabled@:>@]),
+	PYTHON_BINDINGS=$enableval, PYTHON_BINDINGS=no)
+
+AS_IF([test "x$PYTHON_BINDINGS" = "xyes"], [
+	AC_PATH_PROG(PYTHON, python, notfound)
+	if test x$PYTHON == xnotfound; then
+		AC_MSG_ERROR([Python is required for --enable-python but cannot be found])
+	fi
+
+	AC_PATH_PROG(PYTHON_CONFIG, python-config, notfound)
+	if test x$PYTHON_CONFIG == xnotfound; then
+		AC_MSG_ERROR([Python headers are required for --enable-python but cannot be found])
+	fi
+
+	PYTHON_INCDIRS=`$PYTHON_CONFIG --includes`
+	PYTHON_LIBDIRS=`$PYTHON_CONFIG --libs`
+
+	AC_PATH_PROG(CYTHON, cython, notfound)
+	if test x$CYTHON == xnotfound; then
+		AC_MSG_ERROR([Cython is required for --enable-python but cannot be found])
+	fi
+])
+
 m4_ifdef([GTK_DOC_CHECK], [
 GTK_DOC_CHECK([1.14],[--flavour no-tmpl-flat])
 ], [
